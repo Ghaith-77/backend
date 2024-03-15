@@ -1,47 +1,66 @@
-let mongoose = require("mongoose")
+const mongoose = require("mongoose");
+const joi = require("joi");
 
-let userschema = mongoose.createConnection({
-    username:{
-        type:String,
-        require : true,
-        minlenght:3,
-        maxlenght:20
+const userSchema =  mongoose.Schema({
+    username: {
+        type: String,
+        required: true,
+        minlength: 3,
+        maxlength: 20
     },
-    email:{
-        type:String,
-        require : true,
-        minlenght:3,
-        maxlenght:20,
-        unique : true
+    email: {
+        type: String,
+        required: true,
+        minlength: 3,
+        maxlength: 255,
+        unique: true
     },
-    password:{
-        type:String,
-        require : true,
-        minlenght:3,
-        maxlenght:20
+    password: {
+        type: String,
+        required: true,
+        minlength: 3,
+        maxlength: 255
     },
-    isAdmin:{
-        type:Boolean,
-        default:false,
-        
+    isAdmin: {
+        type: Boolean,
+        default: false
     },
-    isAcountVirfid:{
-        type:Boolean,
-        default:false,
-        
+    isAccountVerified: {
+        type: Boolean,
+        default: false
     },
-    profilPhoto:{
-       tpye:Object,
-       default:{
-        url:"https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png",
-        publicId:null
-       }
+    profilePhoto: {
+        type: Object,
+        default: {
+            url: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png",
+            publicId: null
+        }
     },
-    bio: String,
+    bio: {
+        type: String
+    }
+}, { timestamps: true });
 
-},{timestamps:true})
-let usermodel = mongoose.model("user",userschema)
+const userModel = mongoose.model("user", userSchema);
+
+function validationRegister(obj) {
+    const schema = joi.object({
+        username: joi.string().trim().required(),
+        email: joi.string().trim().required(),
+        password: joi.string().trim().required()
+    });
+    return schema.validate(obj);
+}
+function validationLogin(obj) {
+    const schema = joi.object({
+        email: joi.string().trim().required(),
+        password: joi.string().trim().required()
+    });
+    return schema.validate(obj);
+}
 
 module.exports = {
-    usermodel,
-}
+    userModel,
+    validationRegister,
+    validationLogin
+};
